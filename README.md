@@ -59,6 +59,8 @@ Example:
 192.168.1.5:3000
 ```
 
+To find the host IP address, run ```ip a```. The main network device is likely to be the second device in the list after the loopback device with IP ```127.0.0.1```.
+
 The port mappings for the services can be found in the ```docker-compose.yml``` and below for convenience.
 
 | Service     | Port        |
