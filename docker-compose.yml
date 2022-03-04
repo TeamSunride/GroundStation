@@ -1,0 +1,61 @@
+# Docker-Compose Version
+version: ‘3’
+
+# Docker-Compose Guide:
+#     container-name: The name of the container.
+#     image: The name of the image to use for the container.
+#     ports: The ports to expose for the container.
+#     environment: The environment variables to set for the container.
+#     command: The command to run when the container starts.
+#     volumes: The list of volumes to mount for the container.
+#     depends_on: The list of dependencies for this container.
+#     restart: Whether to restart the container or not.
+# networks: The networks to attach the container to.
+
+# Services to run
+services:
+  # Grafana
+  grafana:
+    container_name: grafana
+    hostname: grafana
+    image: grafana/grafana
+    ports:
+      - 3000:3000
+    volumes:
+      - ./grafana/data:/var/lib/grafana
+    restart:
+      always
+  # InfluxDB
+  influxdb:
+      container_name: influxdb
+      hostname: influxdb
+      image: influxdb
+      ports:
+        - 8086:8086
+      volumes:
+        - ./influxdb/data:/var/lib/influxdb2
+      restart:
+        always
+  # Telegraf 0
+  telegraf-0:
+      container_name: telegraf-0
+      hostname: telegraf-0
+      image: telegraf
+      volumes:
+      - ./telegraf/data/telegraf-0.conf:/etc/telegraf/telegraf.conf:ro
+      restart:
+        always
+  # Telegraf 1
+  # telegraf-1:
+  #     container_name: telegraf-1
+  #     hostname: telegraf-1
+  #     image: telegraf
+  #     volumes:
+  #     - ./telegraf/data/telegraf-1.conf:/etc/telegraf/telegraf.conf:ro
+  #     restart:
+  #       always
+# Network for the containers
+networks:
+  # Default network is bridge
+  default:
+    name: telemetry
