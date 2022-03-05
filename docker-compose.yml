@@ -41,6 +41,8 @@ services:
       container_name: telegraf-0
       hostname: telegraf-0
       image: telegraf
+      ports:
+        - 8094:8094
       env_file:
       - ./telegraf/telegraf.env
       volumes:
