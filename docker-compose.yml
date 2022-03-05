@@ -41,8 +41,9 @@ services:
       container_name: telegraf-0
       hostname: telegraf-0
       image: telegraf
+      env_file:
+      - ./telegraf/telegraf.env
       volumes:
-      - ./telegraf/data/telegraf.env:/etc/default/telegraf
       - ./telegraf/data/telegraf-0.conf:/etc/telegraf/telegraf.conf:ro
       restart:
         always
@@ -51,8 +52,9 @@ services:
   #     container_name: telegraf-1
   #     hostname: telegraf-1
   #     image: telegraf
+  #     env_file:
+  #     - ./telegraf/telegraf.env
   #     volumes:
-  #     - ./telegraf/data/telegraf.env:/etc/default/telegraf
   #     - ./telegraf/data/telegraf-1.conf:/etc/telegraf/telegraf.conf:ro
   #     restart:
   #       always
