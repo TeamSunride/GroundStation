@@ -22,6 +22,7 @@ services:
     ports:
       - 3000:3000
     volumes:
+      - ./grafana/grafana.ini:/etc/grafana/grafana.ini
       - ./grafana/data:/var/lib/grafana
     restart:
       always
@@ -30,6 +31,8 @@ services:
       container_name: influxdb
       hostname: influxdb
       image: influxdb
+      env_file:
+        - ./influxdb/influxdb.env
       ports:
         - 8086:8086
       volumes:
@@ -41,12 +44,12 @@ services:
       container_name: telegraf-0
       hostname: telegraf-0
       image: telegraf
-      ports:
-        - 8094:8094
       env_file:
-      - ./telegraf/telegraf.env
+        - ./telegraf/telegraf.env
+      ports:
+        - 9091:9091
       volumes:
-      - ./telegraf/data/telegraf-0.conf:/etc/telegraf/telegraf.conf:ro
+        - ./telegraf/telegraf-0.conf:/etc/telegraf/telegraf.conf:ro
       restart:
         always
   # Telegraf 1
@@ -55,9 +58,11 @@ services:
   #     hostname: telegraf-1
   #     image: telegraf
   #     env_file:
-  #     - ./telegraf/telegraf.env
+  #       - ./telegraf/telegraf.env
+  #     ports:
+  #       - 9092:9092
   #     volumes:
-  #     - ./telegraf/data/telegraf-1.conf:/etc/telegraf/telegraf.conf:ro
+  #       - ./telegraf/telegraf-1.conf:/etc/telegraf/telegraf.conf:ro
   #     restart:
   #       always
 # Network for the containers

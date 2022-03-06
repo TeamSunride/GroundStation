@@ -130,5 +130,8 @@ dmypy.json
 
 # Custom
 *.DS_Store
-./influxdb/*
-./grafana/*
+
+influxdb/data/*
+grafana/data/*
+# exclude grafana database
+!grafana/data/grafana.db
