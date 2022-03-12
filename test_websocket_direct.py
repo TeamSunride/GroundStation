@@ -16,3 +16,4 @@ while True:
 
 
 # TODO: this connection breaks after a few seconds, so fix that (refer to docs for websocket!)
+#testChange
