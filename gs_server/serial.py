@@ -6,7 +6,7 @@ from typing import Coroutine, List, Callable, Any
 # https://github.com/pyserial/pyserial-asyncio/blob/master/documentation/api.rst
 
 
-class SerialLineReader:
+class SerialLineProtocolInput:
     """
     Object that connects to a serial port, and calls a list of outputs when a line is read
     """
@@ -23,7 +23,7 @@ class SerialLineReader:
 
     connected: bool = False
 
-    outputs: List[output_type]
+    outputs: List[output_type] = []
 
     def __init__(self, port: str, baudrate: int):
         self.port = port
@@ -36,8 +36,9 @@ class SerialLineReader:
             info(f"Attempting to open Serial connection on port {self.port}")
             try:
                 # open a serial connection to our Arduino
-                self.reader, self.writer = serial_asyncio.open_serial_connection(loop=loop, limit=None, port=self.port,
-                                                                                 baudrate=self.baudrate)
+                self.reader, self.writer = await serial_asyncio.open_serial_connection(
+                    url=self.port, baudrate=self.baudrate
+                )
             except ConnectionRefusedError:
                 info(f"Connection refused on port {self.port}, retrying in 5 seconds...")
                 await asyncio.sleep(5)
@@ -62,6 +63,7 @@ class SerialLineReader:
                 # try to reconnect if connection was lost
                 asyncio.create_task(self.connect())
             else:
+                line = line.decode()
                 # the gather function allows us to call all of our outputs concurrently
                 # documentation is here https://docs.python.org/3/library/asyncio-task.html#running-tasks-concurrently
 
