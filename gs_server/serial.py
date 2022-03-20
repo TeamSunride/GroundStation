@@ -93,4 +93,4 @@ class FakeSerialLineInput:
 
             await asyncio.gather(*output_coroutines)
 
-            await asyncio.sleep(1/60)
+            await asyncio.sleep(1/25)

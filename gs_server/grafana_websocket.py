@@ -49,9 +49,4 @@ class GrafanaLiveOutput:
 
     async def output(self, output_string: str):
         if self.connected:
-            try:
-                await self.ws.send(output_string)
-            except websockets.ConnectionClosed:
-                info(f"Lost connection to url {self.url}")
-                self.connected = False
-                asyncio.create_task(self.connect())
+            await self.ws.send(output_string)

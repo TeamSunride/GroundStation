@@ -73,7 +73,7 @@ Grafana and InfluxDB have been already configured with a username and password:
 | Service     | Username    | Password    |
 | ----------- | ----------- | ----------- |
 | Grafana     | admin       | sunride     |
-| InfluxDB    | sunride     | telemetry   |
+| InfluxDB    | admin     | sunridetelemetry   |
 
 ### Other Things to Note
 
