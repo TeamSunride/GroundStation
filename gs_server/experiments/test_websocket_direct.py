@@ -1,5 +1,5 @@
 import websocket
-from time import sleep, time
+from time import sleep, time, time_ns
 from math import sin
 
 ws = websocket.WebSocket()
@@ -9,11 +9,13 @@ ws.connect(
 )
 
 while True:
-    message = f"demo,device=sensorA value={sin(time()) * 100}\n"
+    message = f"demo2,device=sensorA " \
+              f"value1={sin(time()) * 100}," \
+              f"value2={sin(time()) * 50}," \
+              f"value3={sin(time() * 2) * 70}\n"
     print(message)
     ws.send(message)
     sleep(1/50)
 
 
 # TODO: this connection breaks after a few seconds, so fix that (refer to docs for websocket!)
-#testChange
