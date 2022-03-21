@@ -89,13 +89,15 @@ class FakeSerialLineInput:
 
     async def listen(self):
         while True:
-            line = f"demo4,device=arduino_uno " \
-                   f"value1={sin(time() * 10) + randint(-100, 100)/200}," \
-                   f"value2={sin(time() * 5) * 2 + randint(-100, 100)/200} " \
-                   f"{round(time() * 1000)}\n"
-
-            output_coroutines = [output(line) for output in self.outputs]
-
-            await asyncio.gather(*output_coroutines)
-
+            asyncio.create_task(self.call_outputs())
             await asyncio.sleep(1/25)
+
+    async def call_outputs(self):
+        line = f"demo4,device=arduino_uno " \
+              f"value1={sin(time() * 10) + randint(-100, 100) / 200}," \
+              f"value2={sin(time() * 5) * 2 + randint(-100, 100) / 200} " \
+              f"{round(time() * 1000)}\n"
+
+        output_coroutines = [asyncio.create_task(output(line)) for output in self.outputs]
+        # print(line)
+        await asyncio.gather(*output_coroutines)

@@ -1,6 +1,7 @@
 from logging import info
 
 from aiohttp import ClientSession
+from aiohttp.client_exceptions import ClientConnectorError, ServerDisconnectedError
 from time import time
 
 # https://docs.aiohttp.org/en/stable/client_quickstart.html
@@ -48,11 +49,18 @@ class InfluxDBOutput:
         timeout_reached = time() - self.last_write > self.buffer_write_timeout
         buffer_full = self.buffer_size >= self.buffer_write_size
         if timeout_reached or buffer_full:
-            await self.session.post(self.write_url, data=self.buffer, headers=self.headers)
-            info(f"Wrote to InfluxDB with buffer size {self.buffer_size}")
-            self.last_write = time()
-            self.buffer = ""
-            self.buffer_size = 0
+            try:
+                await self.session.post(self.write_url, data=self.buffer, headers=self.headers)
+            except Exception as e:
+                info(e)
+                info(f"Failed to write to InfluxDB. Adding to buffer [size {self.buffer_size}]")
+                self.buffer += output_string
+                self.buffer_size += 1
+            else:
+                info(f"Wrote to InfluxDB with buffer size {self.buffer_size}")
+                self.last_write = time()
+                self.buffer = ""
+                self.buffer_size = 0
         else:
             self.buffer += output_string
             self.buffer_size += 1
