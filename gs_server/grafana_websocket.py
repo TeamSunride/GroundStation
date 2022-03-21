@@ -13,12 +13,14 @@ class GrafanaLiveOutput:
     ws: websockets.WebSocketClientProtocol
 
     connected: bool = False
+    remove_timestamp: bool
 
-    def __init__(self, url: str, auth_token: str):
+    def __init__(self, url: str, auth_token: str, remove_timestamp: bool = True):
         self.url = url
         self.headers = [
             ("Authorization", f"Bearer {auth_token}")
         ]
+        self.remove_timestamp = remove_timestamp
 
     async def connect(self):
         while not self.connected:
@@ -49,4 +51,6 @@ class GrafanaLiveOutput:
 
     async def output(self, output_string: str):
         if self.connected:
+            if self.remove_timestamp:
+                output_string = output_string[0:output_string.rfind(" ")].replace("\n", "")
             await self.ws.send(output_string)

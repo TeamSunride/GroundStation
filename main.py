@@ -17,16 +17,14 @@ grafana_output = GrafanaLiveOutput(
 )
 serial_input.add_output(grafana_output.output)
 
-"""
 influxdb_output = InfluxDBOutput(
     host="localhost",
     port=8086,
-    db="telemetry",
-    username="sunride",
-    password="sunridetelemetry"
+    org_name="Sunride",
+    bucket="telemetry",
+    api_token="Cs0uiazCNzgsD-NAShVaDwBHk5RgGwx1LSu4OC5B1dQZyWnu0AhRPExoAvIJTBN0Jqde6B9R8YDnbZMjdEjmOg=="
 )
 serial_input.add_output(influxdb_output.output)
-"""
 
 loop = asyncio.get_event_loop()
 loop.create_task(grafana_output.connect())

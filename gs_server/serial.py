@@ -1,4 +1,6 @@
 import asyncio
+from random import randint
+
 import serial_asyncio
 from serial.serialutil import SerialException
 from logging import info, debug
@@ -87,7 +89,10 @@ class FakeSerialLineInput:
 
     async def listen(self):
         while True:
-            line = f"demo4,device=arduino_uno value1={sin(time() * 10)},value2={sin(time() * 5) * 2}"
+            line = f"demo4,device=arduino_uno " \
+                   f"value1={sin(time() * 10) + randint(-100, 100)/200}," \
+                   f"value2={sin(time() * 5) * 2 + randint(-100, 100)/200} " \
+                   f"{round(time() * 1000)}\n"
 
             output_coroutines = [output(line) for output in self.outputs]
 
