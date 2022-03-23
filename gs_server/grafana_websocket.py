@@ -51,6 +51,4 @@ class GrafanaLiveOutput:
 
     async def output(self, output_string: str):
         if self.connected:
-            if self.remove_timestamp:
-                output_string = output_string[0:output_string.rfind(" ")].replace("\n", "")
             await self.ws.send(output_string)
