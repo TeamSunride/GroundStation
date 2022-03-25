@@ -5,12 +5,12 @@ In this project, Grafana and InfluxDB are combined to provide a great solution f
 
 > [Grafana](https://grafana.com/grafana/) is a multi-platform open source analytics and interactive visualization web
 > application. It provides charts, graphs, and alerts for the web when connected to supported data sources.
-[_Wikipedia_](https://en.wikipedia.org/wiki/Grafana)
+_Source: [Wikipedia](https://en.wikipedia.org/wiki/Grafana)_
 
 > [InfluxDB]() is an open-source time series database (TSDB) developed by the company InfluxData. It is written in the
 > Go programming language for storage and retrieval of time series data in fields such as operations monitoring,
 > application metrics, Internet of Things sensor data, and real-time analytics.
-> [_Wikipedia_](https://en.wikipedia.org/wiki/InfluxDB)
+_Source: [Wikipedia](https://en.wikipedia.org/wiki/InfluxDB)_
 
 Grafana and InfluxDB are hosted in [Docker Containers](https://www.docker.com/resources/what-container/), 
 allowing them to run on most platforms with minimal environment setup/configuration. 
@@ -32,4 +32,13 @@ inefficient.
 ## System Architecture Diagram
 
 ![img.png](images/ground_station_diagram.png)
+
+This ground station system is modular and therefore can easily be expanded. More inputs and outputs can easily be 
+configured in the python script for very custom use cases, or InfluxDB can be read from within any web-enabled 
+application. A few examples of possible applications would include:
+- Offsite data analysis
+- Display of mission data to competition judges in real time
+- Live stream of launch with overlay that uses live telemetry data (think SpaceX broadcasts!)
+
+
 
