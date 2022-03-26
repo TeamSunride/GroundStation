@@ -7,7 +7,6 @@ from typing import List, Tuple
 
 class GrafanaLiveOutput:
     url: str
-    auth_token: str
     headers: List[Tuple[str, str]]
 
     ws: websockets.WebSocketClientProtocol
@@ -17,10 +16,11 @@ class GrafanaLiveOutput:
 
     logger: logging.Logger
 
-    def __init__(self, url: str, auth_token: str, timestamp_precision: str = "ms"):
-        self.url = url
+    def __init__(self, host: str, port: int, stream_id: str, api_token: str, timestamp_precision: str = "ms",
+                 ssl: bool = False):
+        self.url = f"ws{'s' if ssl else ''}://{host}:{port}/api/live/push/{stream_id}"
         self.headers = [
-            ("Authorization", f"Bearer {auth_token}")
+            ("Authorization", f"Bearer {api_token}")
         ]
         self.timestamp_precision = timestamp_precision
 

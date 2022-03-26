@@ -13,8 +13,10 @@ TIMESTAMP_PRECISION = "ms"
 serial_input = FakeSerialLineInput()
 
 grafana_output = GrafanaLiveOutput(
-    url="ws://127.0.0.1:3000/api/live/push/test_stream_id",
-    auth_token="eyJrIjoic2xET3E3aTRZOGE2RjNGdk54MUc5ZGU0TEE0SWpnZk4iLCJuIjoidGVzdCIsImlkIjoxfQ==",
+    host="localhost",
+    port=3000,
+    stream_id="test_stream_id",
+    api_token="eyJrIjoic2xET3E3aTRZOGE2RjNGdk54MUc5ZGU0TEE0SWpnZk4iLCJuIjoidGVzdCIsImlkIjoxfQ==",
     timestamp_precision=TIMESTAMP_PRECISION
 )
 serial_input.add_output(grafana_output.output)
