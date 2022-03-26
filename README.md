@@ -1,80 +1,44 @@
-# SunrIde GroundStation
+# SunrIde Ground Station Software
 
-## Ground Station Setup and Documentation:
+In this project, Grafana and InfluxDB are combined to provide a great solution for data visualization and storage.
 
-This installation guide assumes the ground station is run on a debian based system.
 
-run ```cat /etc/os-release``` in the terminal to check.
+> [Grafana](https://grafana.com/grafana/) is a multi-platform open source analytics and interactive visualization web
+> application. It provides charts, graphs, and alerts for the web when connected to supported data sources.
+_Source: [Wikipedia](https://en.wikipedia.org/wiki/Grafana)_
 
-Next, run ```which docker``` to check if docker is installed.
+> [InfluxDB]() is an open-source time series database (TSDB) developed by the company InfluxData. It is written in the
+> Go programming language for storage and retrieval of time series data in fields such as operations monitoring,
+> application metrics, Internet of Things sensor data, and real-time analytics.
+_Source: [Wikipedia](https://en.wikipedia.org/wiki/InfluxDB)_
 
-If Docker is not installed, it will need to be installed.
+Grafana and InfluxDB are hosted in [Docker Containers](https://www.docker.com/resources/what-container/), 
+allowing them to run on most platforms with minimal environment setup/configuration. 
+[Docker Compose](https://docs.docker.com/compose/) is used to run the containers together.
 
-run the following commands for the straightforward installation:
+In order to stream data into Grafana and InfluxDB, we send strings of data over a Serial connection from an Arduino 
+formatted as [InfluxDB Line Protocol](https://docs.influxdata.com/influxdb/v2.1/reference/syntax/line-protocol/). 
+This is received by a python script, where the data is then sent to Grafana and InfluxDB.
 
-> This installed **stable** Docker version using this method is likely a few months out of date. This should not affect the Ground Station setup.
+[Grafana Live](https://grafana.com/docs/grafana/latest/live/) is a new feature in Grafana which allows data to be 
+pushed to the frontend as soon as it occurs. WebSockets are used for this, and it allows us to display real-time graphs 
+of our data on Grafana's dashboards. However, Grafana is not a database. It does not store data. And if the live data 
+stream is interrupted, we will lose data. Therefore, we need to use a database such as InfluxDB.
 
-```bash
-sudo apt-get update
-sudo apt-get install -y docker.io docker-compose
-```
-```sudo apt-get upgrade``` may be run but it may take time to upgrade depending on the Operating System state.
+The python script streams data to Grafana over a WebSocket connection, and writes data to InfluxDB in batches. This is 
+because InfluxDB offers an HTTP API rather than WebSockets, so sending a separate request for each data point would be 
+inefficient.
 
-Otherwise, follow the instructions in the following links to install the Docker Engine and Docker-Compose.
+## System Architecture Diagram
 
-> RECOMMENDATION: On Raspberry Pi, install the 64bit version of Docker under the Debian install section if the raspbian version installed is 64bit (See command above to check Operating System).
+![img.png](images/ground_station_diagram.png)
 
-https://docs.docker.com/engine/install/
-https://docs.docker.com/compose/install/
+This ground station system is modular and therefore can easily be expanded. More inputs and outputs can easily be 
+configured in the python script for very custom use cases, or InfluxDB can be read from within any web-enabled 
+application. A few examples of possible applications would include:
+- Offsite data analysis
+- Display of mission data to competition judges in real time
+- Live stream of launch with overlay that uses live telemetry data (think SpaceX broadcasts!)
 
-### Spin Up Containers:
 
-To spin up containers, clone this directory using:
 
-```bash
-git clone https://github.com/TeamSunride/GroundStation.git
-```
-
-cd into the directory and run the containers:
-
-```bash
-cd GroundStation
-sudo docker-compose up -d
-```
-
-This will spin up the containers detailed in the ```docker-compose.yml``` file in the root directory.
-
-To check the status of the Docker containers after spinning up the containers, run:
-
-```bash
-sudo docker ps -a
-```
-
-To access the services that have been spun up, navigate to the IP address of the Docker host and append the port number of the service to the IP address.
-
-```
-<IP-address>:<Port>
-
-Example:
-192.168.1.5:3000
-```
-
-To find the host IP address, run ```ip a```. The main network device is likely to be the second device in the list after the loopback device with IP ```127.0.0.1```.
-
-The port mappings for the services can be found in the ```docker-compose.yml``` and below for convenience.
-
-| Service     | Port        |
-| ----------- | ----------- |
-| Grafana     | 3000        |
-| InfluxDB    | 8086        |
-
-Grafana and InfluxDB have been already configured with a username and password:
-
-| Service     | Username    | Password    |
-| ----------- | ----------- | ----------- |
-| Grafana     | admin       | sunride     |
-| InfluxDB    | admin     | sunridetelemetry   |
-
-### Other Things to Note
-
-- Telegraf is configured entirely from its config file. See the ```telegraf_doc.conf``` for examples on how to change the setup for telegraf.
