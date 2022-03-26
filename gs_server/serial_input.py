@@ -5,7 +5,7 @@ from random import randint
 import serial_asyncio
 from serial.serialutil import SerialException
 from typing import Coroutine, List, Callable, Any
-from time import time
+from time import time, time_ns
 from math import sin
 
 # https://github.com/pyserial/pyserial-asyncio/blob/master/documentation/api.rst

@@ -7,12 +7,15 @@ import asyncio
 
 logging.basicConfig(level=logging.INFO)
 
+TIMESTAMP_PRECISION = "ms"
+
 # serial_input = SerialLineInput("COM10", 2000000)
 serial_input = FakeSerialLineInput()
 
 grafana_output = GrafanaLiveOutput(
     url="ws://127.0.0.1:3000/api/live/push/test_stream_id",
-    auth_token="eyJrIjoic2xET3E3aTRZOGE2RjNGdk54MUc5ZGU0TEE0SWpnZk4iLCJuIjoidGVzdCIsImlkIjoxfQ=="
+    auth_token="eyJrIjoic2xET3E3aTRZOGE2RjNGdk54MUc5ZGU0TEE0SWpnZk4iLCJuIjoidGVzdCIsImlkIjoxfQ==",
+    timestamp_precision=TIMESTAMP_PRECISION
 )
 serial_input.add_output(grafana_output.output)
 
@@ -21,7 +24,8 @@ influxdb_output = InfluxDBOutput(
     port=8086,
     org_name="Sunride",
     bucket="telemetry",
-    api_token="Cs0uiazCNzgsD-NAShVaDwBHk5RgGwx1LSu4OC5B1dQZyWnu0AhRPExoAvIJTBN0Jqde6B9R8YDnbZMjdEjmOg=="
+    api_token="Cs0uiazCNzgsD-NAShVaDwBHk5RgGwx1LSu4OC5B1dQZyWnu0AhRPExoAvIJTBN0Jqde6B9R8YDnbZMjdEjmOg==",
+    timestamp_precision=TIMESTAMP_PRECISION
 )
 serial_input.add_output(influxdb_output.output)
 

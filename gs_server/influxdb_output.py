@@ -5,6 +5,7 @@ from aiohttp import ClientSession, ClientResponse
 from aiohttp.client_exceptions import ClientConnectorError, ServerDisconnectedError
 from time import time
 
+
 # https://docs.aiohttp.org/en/stable/client_quickstart.html
 # https://docs.influxdata.com/influxdb/v2.1/api/#tag/Write
 # https://docs.influxdata.com/influxdb/v2.1/write-data/developer-tools/api/
@@ -29,7 +30,8 @@ class InfluxDBOutput:
 
     logger: logging.Logger
 
-    def __init__(self, host: str, port: int, org_name: str, bucket: str, api_token: str, ssl: bool = False):
+    def __init__(self, host: str, port: int, org_name: str, bucket: str, api_token: str, ssl: bool = False,
+                 timestamp_precision: str = "ms"):
         self.logger = logging.getLogger(self.__class__.__name__)
         self.host = host
         self.port = port
@@ -39,7 +41,7 @@ class InfluxDBOutput:
         self.write_url = f"http{'s' if ssl else ''}://{self.host}:{self.port}/api/v2/write?" \
                          f"org={self.org_name}" \
                          f"&bucket={self.bucket}" \
-                         f"&precision=ms"
+                         f"&precision={timestamp_precision}"
 
         self.headers = {
             "Authorization": f"Token {self.api_token}",
@@ -49,6 +51,12 @@ class InfluxDBOutput:
 
     async def write_task_loop(self):
         while True:
+
+            # don't bother making a request if our buffer is empty
+            if self.buffer_size == 0:
+                await asyncio.sleep(1)
+                continue
+
             write_success = False
             start = time()
             try:
@@ -64,7 +72,7 @@ class InfluxDBOutput:
                 end = time()
 
             if write_success:
-                delay_ms = round((end - start) * 1000, 5)
+                delay_ms = round((end - start) * 1000, 1)
                 self.logger.info(f"Wrote {self.buffer_size} lines to InfluxDB [{delay_ms}ms]")
                 self.buffer = ""
                 self.buffer_size = 0
@@ -83,4 +91,3 @@ class InfluxDBOutput:
         # start write task if not started already
         if not self.write_task:
             self.write_task = asyncio.create_task(self.write_task_loop())
-
