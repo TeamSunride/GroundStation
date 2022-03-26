@@ -64,7 +64,7 @@ class InfluxDBOutput:
                 end = time()
 
             if write_success:
-                delay_ms = round((end - start) / 1000, 5)
+                delay_ms = round((end - start) * 1000, 5)
                 self.logger.info(f"Wrote {self.buffer_size} lines to InfluxDB [{delay_ms}ms]")
                 self.buffer = ""
                 self.buffer_size = 0
