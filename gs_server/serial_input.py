@@ -11,7 +11,22 @@ from math import sin
 # https://github.com/pyserial/pyserial-asyncio/blob/master/documentation/api.rst
 
 
-class SerialLineInput:
+class LineProtocolInput:
+    """
+    Base class which should be inherited from. Contains the tooling for calling outputs
+    """
+    output_type = Callable[[str], Any]
+    outputs: List[output_type] = []
+
+    def add_output(self, output: output_type):
+        self.outputs.append(output)
+
+    def call_outputs(self, line):
+        for output in self.outputs:
+            asyncio.create_task(output(line))
+
+
+class SerialLineInput(LineProtocolInput):
     """
     Object that connects to a serial port, and calls a list of outputs when a line is read
     """
@@ -23,13 +38,7 @@ class SerialLineInput:
 
     port: str
     baudrate: int
-
-    output_type = Callable[[str], Any]
-
     connected: bool = False
-
-    outputs: List[output_type] = []
-
     logger: logging.Logger
 
     def __init__(self, port: str, baudrate: int):
@@ -55,9 +64,6 @@ class SerialLineInput:
 
         asyncio.create_task(self.listen())
 
-    def add_output(self, output: output_type):
-        self.outputs.append(output)
-
     async def listen(self):
         while self.connected:
             try:
@@ -71,16 +77,10 @@ class SerialLineInput:
                 asyncio.create_task(self.connect())
             else:
                 line = line.decode()
-                # the gather function allows us to call all of our outputs concurrently
-                # documentation is here https://docs.python.org/3/library/asyncio-task.html#running-tasks-concurrently
-
-                # we construct a list of coroutines with one argument, the line that was read
-                output_coroutines = [output(line) for output in self.outputs]
-
-                await asyncio.gather(*output_coroutines)
+                self.call_outputs(line)
 
 
-class FakeSerialLineInput:
+class FakeSerialLineInput(LineProtocolInput):
     output_type = Callable[[str], Any]
     outputs: List[output_type] = []
 
@@ -92,15 +92,10 @@ class FakeSerialLineInput:
 
     async def listen(self):
         while True:
-            asyncio.create_task(self.call_outputs())
+            line = f"demo4,device=arduino_uno " \
+                   f"value1={sin(time() * 10) + randint(-100, 100) / 200}," \
+                   f"value2={sin(time() * 5) * 2 + randint(-100, 100) / 200} " \
+                   f"{round(time() * 1000)}\n"
+
+            self.call_outputs(line)
             await asyncio.sleep(1/60)
-
-    async def call_outputs(self):
-        line = f"demo4,device=arduino_uno " \
-              f"value1={sin(time() * 10) + randint(-100, 100) / 200}," \
-              f"value2={sin(time() * 5) * 2 + randint(-100, 100) / 200} " \
-              f"{round(time() * 1000)}\n"
-
-        output_coroutines = [asyncio.create_task(output(line)) for output in self.outputs]
-        # print(line)
-        await asyncio.gather(*output_coroutines)
