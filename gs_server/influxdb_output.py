@@ -1,6 +1,7 @@
-from logging import info
+import asyncio
+import logging
 
-from aiohttp import ClientSession
+from aiohttp import ClientSession, ClientResponse
 from aiohttp.client_exceptions import ClientConnectorError, ServerDisconnectedError
 from time import time
 
@@ -21,12 +22,15 @@ class InfluxDBOutput:
 
     buffer: str = ""
     buffer_size: int = 0
-    last_write: float = 0  # seconds
 
-    buffer_write_timeout = 5  # seconds
-    buffer_write_size = 1000  # samples
+    write_interval = 5  # seconds
+
+    write_task: asyncio.Task = None
+
+    logger: logging.Logger
 
     def __init__(self, host: str, port: int, org_name: str, bucket: str, api_token: str, ssl: bool = False):
+        self.logger = logging.getLogger(self.__class__.__name__)
         self.host = host
         self.port = port
         self.org_name = org_name
@@ -43,25 +47,40 @@ class InfluxDBOutput:
             "Accept": "application/json"
         }
 
+    async def write_task_loop(self):
+        while True:
+            write_success = False
+            start = time()
+            try:
+                response: ClientResponse = await self.session.post(
+                    self.write_url, data=self.buffer, headers=self.headers
+                )
+            except Exception as e:
+                self.logger.info(e)
+            else:
+                if response.status == 204:
+                    write_success = True
+            finally:
+                end = time()
+
+            if write_success:
+                delay_ms = round((end - start) / 1000, 5)
+                self.logger.info(f"Wrote {self.buffer_size} lines to InfluxDB [{delay_ms}ms]")
+                self.buffer = ""
+                self.buffer_size = 0
+
+            await asyncio.sleep(self.write_interval)
+
     async def output(self, output_string: str):
         if not output_string.endswith("\n"):
             output_string += "\n"
-        timeout_reached = time() - self.last_write > self.buffer_write_timeout
-        buffer_full = self.buffer_size >= self.buffer_write_size
-        if timeout_reached or buffer_full:
-            try:
-                await self.session.post(self.write_url, data=self.buffer, headers=self.headers)
-            except Exception as e:
-                info(e)
-                info(f"Failed to write to InfluxDB. Adding to buffer [size {self.buffer_size}]")
-                self.buffer += output_string
-                self.buffer_size += 1
-            else:
-                info(f"Wrote to InfluxDB with buffer size {self.buffer_size}")
-                self.last_write = time()
-                self.buffer = ""
-                self.buffer_size = 0
-        else:
-            self.buffer += output_string
-            self.buffer_size += 1
+
+        # add string to buffer
+        self.buffer += output_string
+        # increment buffer size
+        self.buffer_size += 1
+
+        # start write task if not started already
+        if not self.write_task:
+            self.write_task = asyncio.create_task(self.write_task_loop())
 

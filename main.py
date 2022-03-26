@@ -1,25 +1,20 @@
 import logging
 
-from gs_server.serial import SerialLineInput, FakeSerialLineInput
+from gs_server.serial_input import SerialLineInput, FakeSerialLineInput
 from gs_server.grafana_websocket import GrafanaLiveOutput
 from gs_server.influxdb_output import InfluxDBOutput
 import asyncio
 
 logging.basicConfig(level=logging.INFO)
 
-
-async def my_output(line):
-    print(line)
-
-serial_input = SerialLineInput("COM10", 2000000)
-# serial_input = FakeSerialLineInput()
+# serial_input = SerialLineInput("COM10", 2000000)
+serial_input = FakeSerialLineInput()
 
 grafana_output = GrafanaLiveOutput(
     url="ws://127.0.0.1:3000/api/live/push/test_stream_id",
     auth_token="eyJrIjoic2xET3E3aTRZOGE2RjNGdk54MUc5ZGU0TEE0SWpnZk4iLCJuIjoidGVzdCIsImlkIjoxfQ=="
 )
 serial_input.add_output(grafana_output.output)
-serial_input.add_output(my_output)
 
 influxdb_output = InfluxDBOutput(
     host="localhost",

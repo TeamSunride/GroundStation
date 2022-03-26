@@ -1,9 +1,9 @@
 import asyncio
+import logging
 from random import randint
 
 import serial_asyncio
 from serial.serialutil import SerialException
-from logging import info, debug
 from typing import Coroutine, List, Callable, Any
 from time import time
 from math import sin
@@ -30,24 +30,27 @@ class SerialLineInput:
 
     outputs: List[output_type] = []
 
+    logger: logging.Logger
+
     def __init__(self, port: str, baudrate: int):
         self.port = port
         self.baudrate = baudrate
+        self.logger = logging.getLogger(self.__class__.__name__)
 
     async def connect(self):
         while not self.connected:
-            info(f"Attempting to open Serial connection on port {self.port}")
+            self.logger.info(f"Attempting to open Serial connection on port {self.port}")
             try:
                 # open a serial connection to our Arduino
                 self.reader, self.writer = await serial_asyncio.open_serial_connection(
                     url=self.port, baudrate=self.baudrate
                 )
             except (ConnectionRefusedError, SerialException) as e:
-                info(e)
-                info(f"Connection refused on port {self.port}, retrying in 5 seconds...")
+                self.logger.info(e)
+                self.logger.info(f"Connection refused on port {self.port}, retrying in 5 seconds...")
                 await asyncio.sleep(5)
             else:
-                info(f"Successfully opened Serial connection on port {self.port}")
+                self.logger.info(f"Successfully opened Serial connection on port {self.port}")
                 self.connected = True
 
         asyncio.create_task(self.listen())
@@ -61,7 +64,7 @@ class SerialLineInput:
                 # read a line of data from the serial port
                 line = await self.reader.readline()
             except (ConnectionResetError, SerialException):
-                info(f"Connection lost on port {self.port}")
+                self.logger.info(f"Connection lost on port {self.port}")
                 self.connected = False
 
                 # try to reconnect if connection was lost
@@ -90,7 +93,7 @@ class FakeSerialLineInput:
     async def listen(self):
         while True:
             asyncio.create_task(self.call_outputs())
-            await asyncio.sleep(1/25)
+            await asyncio.sleep(1/60)
 
     async def call_outputs(self):
         line = f"demo4,device=arduino_uno " \
