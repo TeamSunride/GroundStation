@@ -1,0 +1,19 @@
+timestamp_precision: ms
+
+SerialLineInput:
+  port: COM10
+  baudrate: 2000000
+
+GrafanaLiveOutput:
+  host: localhost
+  port: 3000
+  stream_id: test_stream_id
+  api_token: eyJrIjoic2xET3E3aTRZOGE2RjNGdk54MUc5ZGU0TEE0SWpnZk4iLCJuIjoidGVzdCIsImlkIjoxfQ==
+
+InfluxDBOutput:
+  host: localhost
+  port: 8086
+  org_name: Sunride
+  bucket: telemetry
+  api_token: Cs0uiazCNzgsD-NAShVaDwBHk5RgGwx1LSu4OC5B1dQZyWnu0AhRPExoAvIJTBN0Jqde6B9R8YDnbZMjdEjmOg==
+
