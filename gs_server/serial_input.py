@@ -21,9 +21,10 @@ class LineProtocolInput:
     def add_output(self, output: output_type):
         self.outputs.append(output)
 
-    def call_outputs(self, line):
-        for output in self.outputs:
-            asyncio.create_task(output(line))
+    async def call_outputs(self, line):
+        output_coroutines = [output(line) for output in self.outputs]
+
+        await asyncio.gather(*output_coroutines)
 
 
 class SerialLineInput(LineProtocolInput):
@@ -77,7 +78,7 @@ class SerialLineInput(LineProtocolInput):
                 asyncio.create_task(self.connect())
             else:
                 line = line.decode()
-                self.call_outputs(line)
+                await self.call_outputs(line)
 
 
 class FakeSerialLineInput(LineProtocolInput):
@@ -97,5 +98,5 @@ class FakeSerialLineInput(LineProtocolInput):
                    f"value2={sin(time() * 5) * 2 + randint(-100, 100) / 200} " \
                    f"{round(time() * 1000)}\n"
 
-            self.call_outputs(line)
-            await asyncio.sleep(1/60)
+            await self.call_outputs(line)
+            await asyncio.sleep(1/165)
