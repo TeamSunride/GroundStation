@@ -33,4 +33,8 @@ serial_input.add_output(influxdb_output.output)
 loop = asyncio.get_event_loop()
 loop.create_task(grafana_output.connect())
 loop.create_task(serial_input.connect())
-loop.run_forever()
+try:
+    loop.run_forever()
+except KeyboardInterrupt:
+    print("Stopping...")
+    pass
