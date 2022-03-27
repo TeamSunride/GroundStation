@@ -22,7 +22,7 @@ class LineProtocolInput:
         self.outputs.append(output)
 
     async def call_outputs(self, line):
-        output_coroutines = [output(line) for output in self.outputs]
+        output_coroutines = [asyncio.create_task(output(line)) for output in self.outputs]
 
         await asyncio.gather(*output_coroutines)
 
