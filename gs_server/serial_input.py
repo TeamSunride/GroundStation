@@ -102,4 +102,4 @@ class FakeSerialLineInput(LineProtocolInput):
                    f"{round(time() * 1000)}\n"
 
             await self.call_outputs(line)
-            await asyncio.sleep(1/165)
+            await asyncio.sleep(1/30)
