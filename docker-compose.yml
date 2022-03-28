@@ -39,32 +39,6 @@ services:
         - ./influxdb/data:/var/lib/influxdb2
       restart:
         always
-  # Telegraf 0
-  # telegraf-0:
-  #     container_name: telegraf-0
-  #     hostname: telegraf-0
-  #     image: telegraf
-  #     env_file:
-  #       - ./telegraf/telegraf.env
-  #     ports:
-  #       - 9091:9091
-  #     volumes:
-  #       - ./telegraf/telegraf-0.conf:/etc/telegraf/telegraf.conf:ro
-  #     restart:
-  #       always
-  # Telegraf 1
-  # telegraf-1:
-  #     container_name: telegraf-1
-  #     hostname: telegraf-1
-  #     image: telegraf
-  #     env_file:
-  #       - ./telegraf/telegraf.env
-  #     ports:
-  #       - 9092:9092
-  #     volumes:
-  #       - ./telegraf/telegraf-1.conf:/etc/telegraf/telegraf.conf:ro
-  #     restart:
-  #       always
 # Network for the containers
 networks:
   # Default network is bridge
