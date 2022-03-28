@@ -1,8 +1,5 @@
 import logging
-
-from gs_server.serial_input import SerialLineInput, FakeSerialLineInput
-from gs_server.grafana_websocket import GrafanaLiveOutput
-from gs_server.influxdb_output import InfluxDBOutput
+from gs_server import *
 import asyncio
 
 logging.basicConfig(level=logging.INFO)
