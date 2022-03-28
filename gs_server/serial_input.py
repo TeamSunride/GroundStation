@@ -82,6 +82,9 @@ class SerialLineInput(LineProtocolInput):
 
 
 class FakeSerialLineInput(LineProtocolInput):
+    """
+    Fake serial input used for development
+    """
     output_type = Callable[[str], Any]
     outputs: List[output_type] = []
 

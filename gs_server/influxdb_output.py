@@ -50,6 +50,9 @@ class InfluxDBOutput:
         }
 
     async def write_task_loop(self):
+        """
+        This loop runs as an asyncio.Task and makes a web request to InfluxDB every `self.write_interval` seconds
+        """
         while True:
 
             # don't bother making a request if our buffer is empty
@@ -79,7 +82,11 @@ class InfluxDBOutput:
 
             await asyncio.sleep(self.write_interval)
 
-    async def output(self, output_string: str):
+    async def input(self, output_string: str):
+        """
+        This method should be added as an output of a LineProtocolInput using its add_output function
+        :param output_string: The line protocol string to be sent to influxDB
+        """
         if not output_string.endswith("\n"):
             output_string += "\n"
 

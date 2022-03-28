@@ -27,6 +27,9 @@ class GrafanaLiveOutput:
         self.logger = logging.getLogger(self.__class__.__name__)
 
     async def connect(self):
+        """
+        This method should be called as an asyncio task when the program is started.
+        """
         while not self.connected:
             try:
                 self.logger.info(f"Connecting to url {self.url}")
@@ -45,6 +48,9 @@ class GrafanaLiveOutput:
         asyncio.create_task(self.listen())
 
     async def listen(self):
+        """
+        This task is started after the WebSocket is connected
+        """
         while self.connected:
             try:
                 await self.ws.recv()  # raises ConnectionClosed if the connection is lost
@@ -53,7 +59,11 @@ class GrafanaLiveOutput:
                 self.connected = False
                 asyncio.create_task(self.connect())
 
-    async def output(self, output_string: str):
+    async def input(self, output_string: str):
+        """
+    `   This method should be added as an output of a LineProtocolInput using its add_output function
+        :param output_string: The line protocol string to be sent to grafana
+        """
         if not self.connected:
             return
 

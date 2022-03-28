@@ -19,7 +19,7 @@ grafana_output = GrafanaLiveOutput(
     api_token="eyJrIjoic2xET3E3aTRZOGE2RjNGdk54MUc5ZGU0TEE0SWpnZk4iLCJuIjoidGVzdCIsImlkIjoxfQ==",
     timestamp_precision=TIMESTAMP_PRECISION
 )
-serial_input.add_output(grafana_output.output)
+serial_input.add_output(grafana_output.input)
 
 influxdb_output = InfluxDBOutput(
     host="localhost",
@@ -29,7 +29,7 @@ influxdb_output = InfluxDBOutput(
     api_token="Cs0uiazCNzgsD-NAShVaDwBHk5RgGwx1LSu4OC5B1dQZyWnu0AhRPExoAvIJTBN0Jqde6B9R8YDnbZMjdEjmOg==",
     timestamp_precision=TIMESTAMP_PRECISION
 )
-serial_input.add_output(influxdb_output.output)
+serial_input.add_output(influxdb_output.input)
 
 loop = asyncio.get_event_loop()
 loop.create_task(grafana_output.connect())
