@@ -82,6 +82,9 @@ class SerialLineInput(LineProtocolInput):
 
 
 class FakeSerialLineInput(LineProtocolInput):
+    """
+    Fake serial input used for development
+    """
     output_type = Callable[[str], Any]
     outputs: List[output_type] = []
 
@@ -99,4 +102,4 @@ class FakeSerialLineInput(LineProtocolInput):
                    f"{round(time() * 1000)}\n"
 
             await self.call_outputs(line)
-            await asyncio.sleep(1/165)
+            await asyncio.sleep(1/30)
