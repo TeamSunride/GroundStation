@@ -90,22 +90,23 @@ class InfluxDBOutput:
         This method should be added as an output of a LineProtocolInput using its add_output function
         :param output_string: The line protocol string to be sent to influxDB
         """
-        if not output_string.endswith("\n"):
-            output_string += "\n"
+
+        output_string = output_string.replace("\n", "").replace("\r", "")
 
         possible_timestamp_position = output_string.rfind(" ") + 1
-        possible_timestamp = output_string[possible_timestamp_position:].strip("\n")
+        possible_timestamp = output_string[possible_timestamp_position:].strip("\n").strip("\r")
         has_timestamp = possible_timestamp.isdigit()
 
         if not has_timestamp:
             multiplier = \
-                1/1_000_000_000 if self.timestamp_precision == "s" else \
-                1/1_000_000 if self.timestamp_precision == "ms" else \
-                1/1_000 if self.timestamp_precision == "us" else ''
+                1 / 1_000_000_000 if self.timestamp_precision == "s" else \
+                    1 / 1_000_000 if self.timestamp_precision == "ms" else \
+                        1 / 1_000 if self.timestamp_precision == "us" else ''
 
             timestamp = round(time_ns() * multiplier)
+            output_string += " " + str(timestamp)
 
-            output_string += str(timestamp)
+        output_string += "\n"
 
         # add string to buffer
         self.buffer += output_string
