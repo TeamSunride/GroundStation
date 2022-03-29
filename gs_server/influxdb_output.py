@@ -3,7 +3,7 @@ import logging
 
 from aiohttp import ClientSession, ClientResponse
 from aiohttp.client_exceptions import ClientConnectorError, ServerDisconnectedError
-from time import time
+from time import time, time_ns
 
 
 # https://docs.aiohttp.org/en/stable/client_quickstart.html
@@ -30,8 +30,11 @@ class InfluxDBOutput:
 
     logger: logging.Logger
 
+    timestamp_precision: str
+
     def __init__(self, host: str, port: int, org_name: str, bucket: str, api_token: str, ssl: bool = False,
                  timestamp_precision: str = "ms"):
+        self.timestamp_precision = timestamp_precision
         self.logger = logging.getLogger(self.__class__.__name__)
         self.host = host
         self.port = port
@@ -41,7 +44,7 @@ class InfluxDBOutput:
         self.write_url = f"http{'s' if ssl else ''}://{self.host}:{self.port}/api/v2/write?" \
                          f"org={self.org_name}" \
                          f"&bucket={self.bucket}" \
-                         f"&precision={timestamp_precision}"
+                         f"&precision={self.timestamp_precision}"
 
         self.headers = {
             "Authorization": f"Token {self.api_token}",
@@ -82,6 +85,20 @@ class InfluxDBOutput:
     async def output(self, output_string: str):
         if not output_string.endswith("\n"):
             output_string += "\n"
+
+        possible_timestamp_position = output_string.rfind(" ") + 1
+        possible_timestamp = output_string[possible_timestamp_position:].strip("\n")
+        has_timestamp = possible_timestamp.isdigit()
+
+        if not has_timestamp:
+            multiplier = \
+                1/1_000_000_000 if self.timestamp_precision == "s" else \
+                1/1_000_000 if self.timestamp_precision == "ms" else \
+                1/1_000 if self.timestamp_precision == "us" else ''
+
+            timestamp = round(time_ns() * multiplier)
+
+            output_string += str(timestamp)
 
         # add string to buffer
         self.buffer += output_string
