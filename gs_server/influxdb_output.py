@@ -35,7 +35,6 @@ class InfluxDBOutput:
     def __init__(self, host: str, port: int, org_name: str, bucket: str, api_token: str, ssl: bool = False,
                  timestamp_precision: str = "ms"):
         self.timestamp_precision = timestamp_precision
-        self.logger = logging.getLogger(self.__class__.__name__)
         self.host = host
         self.port = port
         self.org_name = org_name
@@ -51,6 +50,8 @@ class InfluxDBOutput:
             "Content-Type": "text/plain; charset=utf-8",
             "Accept": "application/json"
         }
+
+        self.logger = logging.getLogger(f"{self.__class__.__name__} {self.host}")
 
     async def write_task_loop(self):
         """
