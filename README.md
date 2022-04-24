@@ -187,3 +187,7 @@ In order for your 'channel' to be an option in the drop-down list, you must firs
 More information about Grafana Live channels can be found 
 [here](https://grafana.com/docs/grafana/latest/live/live-channel/).
 
+
+## Ground Station PCB Circuit Diagram
+
+![](images/Screenshot 2022-04-24 at 12.24.02.png)
