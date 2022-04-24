@@ -190,6 +190,6 @@ More information about Grafana Live channels can be found
 
 ## Ground Station PCB Circuit Diagram
 
-![](images/Screenshot_2022-04-24_at_12.24.02.png).
+![](images/PCB_high_level.png).
 
 
