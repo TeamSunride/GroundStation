@@ -77,7 +77,7 @@ class SerialLineInput(LineProtocolInput):
                 # try to reconnect if connection was lost
                 asyncio.create_task(self.connect())
             else:
-                line = line.decode()
+                line = line.decode().strip("\n").strip("\r") + "\n"
                 await self.call_outputs(line)
 
 
