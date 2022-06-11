@@ -72,7 +72,8 @@ class InfluxDBOutput:
                 if response.status == 204:
                     write_success = True
                 else:
-                    self.logger.info(f"Error writing to InfluxDB. Response: {response.status}\n{response.content}")
+                    self.logger.info(f"Error writing to InfluxDB. Response: {response.status}"
+                                     f"\n{await response.content.read()}")
             finally:
                 end = time()
 
