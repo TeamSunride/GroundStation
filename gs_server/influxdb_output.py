@@ -63,7 +63,7 @@ class InfluxDBOutput:
             write_success = False
             start = time()
             try:
-                response: ClientResponse = await self.session.post(
+                response = await self.session.post(
                     self.write_url, data=self.buffer, headers=self.headers
                 )
             except Exception as e:
@@ -71,6 +71,8 @@ class InfluxDBOutput:
             else:
                 if response.status == 204:
                     write_success = True
+                else:
+                    self.logger.info(f"Error writing to InfluxDB. Response code: {response.status}")
             finally:
                 end = time()
 
