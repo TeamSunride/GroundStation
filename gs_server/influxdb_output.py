@@ -74,6 +74,10 @@ class InfluxDBOutput:
                 else:
                     self.logger.info(f"Error writing to InfluxDB. Response: {response.status}"
                                      f"\n{await response.content.read()}")
+                    if response.status == 400:  # bad request
+                        # throw away data currently in the buffer as it contains errors
+                        self.buffer = ""
+                        self.buffer_size = 0
             finally:
                 end = time()
 
