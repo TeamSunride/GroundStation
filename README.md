@@ -63,9 +63,11 @@ This project requires Python 3.7 or higher to be installed. There are some addit
 - [aiohttp](https://docs.aiohttp.org/en/stable/) - used by the `InfluxDBOutput` class for making asynchronous HTTP
   requests to write data to InfluxDB
 
+- [coloredlogs](https://github.com/xolox/python-coloredlogs) - used to add colour to Python's `logging` module
+
 These can be installed with `pip`, the python package manager, by running the following command:
 
-    pip install websockets pyserial-asyncio aiohttp
+    pip install websockets pyserial-asyncio aiohttp coloredlogs
 
 ### Example script
 
