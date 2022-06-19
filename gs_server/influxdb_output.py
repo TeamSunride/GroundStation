@@ -72,9 +72,10 @@ class InfluxDBOutput:
                 if response.status == 204:
                     write_success = True
                 else:
-                    self.logger.info(f"Error writing to InfluxDB. Response: {response.status}"
-                                     f"\n{await response.content.read()}")
+                    self.logger.error(f"Error writing to InfluxDB. Response: {response.status}"
+                                      f"\n{await response.content.read()}")
                     if response.status == 400:  # bad request
+                        self.logger.warning("Error was due to bad request. Throwing away buffer.")
                         # throw away data currently in the buffer as it contains errors
                         self.buffer = ""
                         self.buffer_size = 0
@@ -83,7 +84,8 @@ class InfluxDBOutput:
 
             if write_success:
                 delay_ms = round((end - start) * 1000, 1)
-                self.logger.info(f"Wrote {self.buffer_size} lines to InfluxDB [{delay_ms}ms]")
+                self.logger.info(
+                    f"Wrote {self.buffer_size} lines to InfluxDB [{delay_ms}ms]")
                 self.buffer = ""
                 self.buffer_size = 0
 

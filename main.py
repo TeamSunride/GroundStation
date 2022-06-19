@@ -8,8 +8,8 @@ logging.basicConfig(level=logging.INFO)
 # create a variable that defines the input timestamp precision
 TIMESTAMP_PRECISION = "ms"
 
-# serial_input = SerialLineInput("COM10", 2000000)
-serial_input = FakeSerialLineInput()
+serial_input = SerialLineInput("COM3", 115200)
+# serial_input = FakeSerialLineInput()
 
 # define our GrafanaLiveOutput object
 grafana_output = GrafanaLiveOutput(
