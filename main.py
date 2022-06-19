@@ -35,11 +35,11 @@ influxdb_output = InfluxDBOutput(
 serial_input.add_output(influxdb_output.input)
 
 # get asyncio event loop and connect the serial/grafana inputs/outputs
-loop = asyncio.get_event_loop()
+loop = asyncio.get_event_loop_policy().get_event_loop()
 loop.create_task(grafana_output.connect())
 loop.create_task(serial_input.connect())
 try:
     # run the loop forever
     loop.run_forever()
-except KeyboardInterrupt:  # prevent an error from showing when the script is closed
+except KeyboardInterrupt:  # hide KeyboardInterrupt error
     print("Stopping...")
