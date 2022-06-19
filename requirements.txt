@@ -1,0 +1,5 @@
+aiohttp==3.8.1
+coloredlogs==15.0.1
+pyserial==3.5
+pyserial_asyncio==0.6
+websockets==10.3

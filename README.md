@@ -69,6 +69,10 @@ These can be installed with `pip`, the python package manager, by running the fo
 
     pip install websockets pyserial-asyncio aiohttp coloredlogs
 
+Alternatively,
+
+    pip install requirements.txt
+
 ### Example script
 
 ```python
