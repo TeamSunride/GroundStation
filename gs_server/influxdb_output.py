@@ -5,6 +5,8 @@ from aiohttp import ClientSession, ClientResponse
 from aiohttp.client_exceptions import ClientConnectorError, ServerDisconnectedError
 from time import time
 
+import re
+from influx_line_protocol import Metric, MetricCollection
 
 # https://docs.aiohttp.org/en/stable/client_quickstart.html
 # https://docs.influxdata.com/influxdb/v2.1/api/#tag/Write
@@ -30,23 +32,33 @@ class InfluxDBOutput:
 
     logger: logging.Logger
 
-    def __init__(self, host: str, port: int, org_name: str, bucket: str, api_token: str, ssl: bool = False,
-                 timestamp_precision: str = "ms"):
+    def __init__(
+        self,
+        host: str,
+        port: int,
+        org_name: str,
+        bucket: str,
+        api_token: str,
+        ssl: bool = False,
+        timestamp_precision: str = "ms",
+    ):
         self.logger = logging.getLogger(self.__class__.__name__)
         self.host = host
         self.port = port
         self.org_name = org_name
         self.bucket = bucket
         self.api_token = api_token
-        self.write_url = f"http{'s' if ssl else ''}://{self.host}:{self.port}/api/v2/write?" \
-                         f"org={self.org_name}" \
-                         f"&bucket={self.bucket}" \
-                         f"&precision={timestamp_precision}"
+        self.write_url = (
+            f"http{'s' if ssl else ''}://{self.host}:{self.port}/api/v2/write?"
+            f"org={self.org_name}"
+            f"&bucket={self.bucket}"
+            f"&precision={timestamp_precision}"
+        )
 
         self.headers = {
             "Authorization": f"Token {self.api_token}",
             "Content-Type": "text/plain; charset=utf-8",
-            "Accept": "application/json"
+            "Accept": "application/json",
         }
 
     async def write_task_loop(self):
@@ -72,10 +84,14 @@ class InfluxDBOutput:
                 if response.status == 204:
                     write_success = True
                 else:
-                    self.logger.error(f"Error writing to InfluxDB. Response: {response.status}"
-                                      f"\n{await response.content.read()}")
+                    self.logger.error(
+                        f"Error writing to InfluxDB. Response: {response.status}"
+                        f"\n{await response.content.read()}"
+                    )
                     if response.status == 400:  # bad request
-                        self.logger.warning("Error was due to bad request. Throwing away buffer.")
+                        self.logger.warning(
+                            "Error was due to bad request. Throwing away buffer."
+                        )
                         # throw away data currently in the buffer as it contains errors
                         self.buffer = ""
                         self.buffer_size = 0
@@ -85,7 +101,8 @@ class InfluxDBOutput:
             if write_success:
                 delay_ms = round((end - start) * 1000, 1)
                 self.logger.info(
-                    f"Wrote {self.buffer_size} lines to InfluxDB [{delay_ms}ms]")
+                    f"Wrote {self.buffer_size} lines to InfluxDB [{delay_ms}ms]"
+                )
                 self.buffer = ""
                 self.buffer_size = 0
 

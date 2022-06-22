@@ -3,3 +3,5 @@ coloredlogs==15.0.1
 pyserial==3.5
 pyserial_asyncio==0.6
 websockets==10.3
+# "influxdb-client[async]"==1.29.1
+influx_line_protocol==0.1.4
