@@ -1,5 +1,8 @@
 # SunrIde Ground Station Software
 
+![img.png](images/dart_demo.png)
+_Example dashboard from our MRAS (Multi Rocket Avionics System) project_
+
 In this project, Grafana and InfluxDB are combined to provide a great solution for data visualization and storage.
 
 
